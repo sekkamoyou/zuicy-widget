@@ -32,11 +32,11 @@ The widget only shows while something is playing. It hides 2 seconds after you p
 
 Open `dashboard.html` in Chrome or Edge to change settings with a live preview. The dashboard UI is in Korean for now.
 
-Click **위젯 폴더 연결** (connect widget folder) and pick the folder with `index.html`. Settings are saved there, and the widget in OBS picks them up within a few seconds. In browsers that can't connect a folder, use **설정 파일 다운로드** (download config files) and put both files next to `index.html`.
+Click **위젯 폴더 연결** (connect widget folder), select the folder with `index.html`, and grant write access. Changes are then saved to that folder and appear in OBS within a few seconds. In browsers that can't connect a folder, use **설정 파일 다운로드** (download config files) and put both files next to `index.html`.
 
 ## Settings
 
-`widget-config.js` (the dashboard writes it for you):
+Default `widget-config.js`:
 
 ```js
 window.__zuicyConfig = { "host": "localhost:10767", "token": "", "bg": "art", "font": "" };
@@ -50,7 +50,7 @@ window.__zuicyConfig = { "host": "localhost:10767", "token": "", "bg": "art", "f
 | `font` | | Name of a font installed on the OBS PC |
 | `debug` | `false` | Show diagnostics at the bottom of the widget. Use `debug=1` in the URL |
 
-The same keys work as URL parameters (`index.html?bg=artist`) and override the file. OBS local file mode can drop URL parameters, though, so keep your usual settings in the file.
+URL parameters for `host`, `token`, `bg`, and `font` (for example, `index.html?bg=artist`) override the file settings. OBS local file mode can drop URL parameters, so keep your usual settings in the file.
 
 `widget-config.json` is a JSON version of the same file. It's only read over http, when the JS file is missing.
 
@@ -111,6 +111,8 @@ To bundle only what the OBS PC needs:
 ```sh
 zip -r ../zuicy.zip index.html dashboard.html widget-config.* assets LICENSE -x "*.DS_Store" "assets/sass/*"
 ```
+
+The ZIP includes your current configuration files. Keep it private if those files contain an app token. To move artist photos and aliases, also copy the `artist-images/` folder alongside `index.html`.
 
 ## License
 

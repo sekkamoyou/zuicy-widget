@@ -32,11 +32,11 @@ curl -i http://localhost:10767/api/v2/playback          # Cider 3.x: 200
 
 `dashboard.html`을 Chrome이나 Edge에서 열면 미리보기를 보면서 설정을 바꿀 수 있습니다.
 
-**위젯 폴더 연결**을 누르고 `index.html`이 있는 폴더를 선택하면 설정이 그 폴더에 저장되고, OBS 위젯에도 몇 초 안에 반영됩니다. 폴더 연결이 안 되는 브라우저라면 **설정 파일 다운로드**로 받은 파일 두 개를 `index.html`과 같은 폴더에 넣어 주세요.
+**위젯 폴더 연결**을 누르고 `index.html`이 있는 폴더의 쓰기 권한을 허용해 주세요. 이후 설정을 바꾸면 폴더에 저장되고 OBS 위젯에도 몇 초 안에 반영됩니다. 폴더 연결이 안 되는 브라우저라면 **설정 파일 다운로드**로 받은 파일 두 개를 `index.html`과 같은 폴더에 넣어 주세요.
 
 ## 설정
 
-대시보드에서 설정을 저장하면 `widget-config.js`가 생성됩니다.
+아래는 `widget-config.js`의 기본 설정입니다.
 
 ```js
 window.__zuicyConfig = { "host": "localhost:10767", "token": "", "bg": "art", "font": "" };
@@ -50,7 +50,7 @@ window.__zuicyConfig = { "host": "localhost:10767", "token": "", "bg": "art", "f
 | `font` | | OBS PC에 설치된 폰트 이름 |
 | `debug` | `false` | 위젯 하단에 진단 정보 표시 (URL에서는 `debug=1`) |
 
-같은 키를 URL 파라미터(`index.html?bg=artist`)로 넘겨도 되고, 그러면 파일보다 우선합니다. 다만 OBS 로컬 파일 모드에서는 파라미터가 사라지기도 해서 평소 설정은 파일에 두는 편이 안전합니다.
+`host`, `token`, `bg`, `font`를 URL 파라미터(예: `index.html?bg=artist`)로 지정하면 파일 설정보다 우선합니다. OBS 로컬 파일 모드에서는 URL 파라미터가 유지되지 않을 수 있으니 평소 설정은 파일에 저장해 주세요.
 
 `widget-config.json`은 같은 내용의 JSON 버전입니다. http로 띄웠는데 JS 파일이 없을 때만 읽습니다.
 
@@ -111,6 +111,8 @@ OBS PC로 옮길 ZIP 파일을 만듭니다.
 ```sh
 zip -r ../zuicy.zip index.html dashboard.html widget-config.* assets LICENSE -x "*.DS_Store" "assets/sass/*"
 ```
+
+ZIP에는 현재 설정 파일이 들어갑니다. 앱 토큰이 저장된 ZIP은 공유하지 마세요. 아티스트 사진과 별칭을 옮기려면 `artist-images/` 폴더도 `index.html` 옆에 복사해 주세요.
 
 ## 라이선스
 
