@@ -98,20 +98,14 @@ cd tools && npm install && npm run mock   # localhost:10767
 python3 -m http.server 8080               # 다른 터미널에서, 프로젝트 루트 기준
 ```
 
-`http://localhost:8080/index.html?debug=1`과 `http://localhost:8080/dashboard.html`을 열어서 확인합니다. 모의 서버는 v1 API만 있는 Cider처럼 동작하고 8초마다 곡을 바꿉니다. 다른 상황을 테스트하려면 `tools/mock-cider.js`의 `setInterval` 부분을 고치면 됩니다. 실제 OBS는 위젯을 `file://`로 읽기 때문에, http에서 확인한 뒤에도 파일로 한 번 더 열어 보는 게 좋습니다.
+`http://localhost:8080/index.html?debug=1`과 `http://localhost:8080/dashboard.html`을 엽니다. 모의 서버는 Cider v1 API를 재현하고 8초마다 곡을 바꿉니다. OBS 로컬 파일 모드를 확인하려면 `index.html`을 브라우저에서 파일로도 엽니다.
 
-스타일을 수정했다면 CSS를 다시 컴파일해서 같이 커밋해 주세요. OBS와 대시보드는 컴파일된 CSS를 그대로 읽습니다.
+OBS와 대시보드는 `assets/css/`의 CSS를 직접 읽습니다. SCSS를 수정했다면 아래 명령으로 CSS를 다시 생성합니다.
 
 ```sh
 sass --no-source-map assets/sass/style.scss assets/css/style.css    # 대시보드
 sass --no-source-map assets/sass/widget.scss assets/css/widget.css  # 위젯
 ```
-
-작업할 때는 아래 규칙을 지켜 주세요.
-
-- OBS PC가 오프라인이어도 동작하도록 CDN이나 웹폰트는 쓰지 않습니다.
-- 위젯이 로컬 파일로 열리기 때문에 경로는 모두 상대 경로로 씁니다.
-- UI 문구는 한 화면 안에서 한 언어로 맞춥니다. 브랜드명, 제품명, 파일명은 예외입니다.
 
 OBS PC로 옮길 ZIP 파일을 만듭니다.
 

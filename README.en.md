@@ -98,20 +98,14 @@ cd tools && npm install && npm run mock   # localhost:10767
 python3 -m http.server 8080               # in another terminal, from the project root
 ```
 
-Then open `http://localhost:8080/index.html?debug=1` and `http://localhost:8080/dashboard.html`. The mock acts like a v1-only Cider and switches tracks every 8 seconds. For other scenarios, edit the `setInterval` block in `tools/mock-cider.js`. OBS loads the widget over `file://`, so open it as a file too before calling it done.
+Open `http://localhost:8080/index.html?debug=1` and `http://localhost:8080/dashboard.html`. The mock serves the Cider v1 API and switches tracks every 8 seconds. To check OBS local file mode, also open `index.html` as a local file in your browser.
 
-If you change styles, recompile and commit the CSS as well. OBS and the dashboard read the compiled CSS directly.
+OBS and the dashboard read the CSS in `assets/css/` directly. After editing the SCSS, regenerate the CSS with these commands.
 
 ```sh
 sass --no-source-map assets/sass/style.scss assets/css/style.css    # dashboard
 sass --no-source-map assets/sass/widget.scss assets/css/widget.css  # widget
 ```
-
-House rules:
-
-- No CDNs or web fonts. The OBS PC might be offline.
-- Relative paths only. The widget is opened as a local file.
-- One UI language per screen. Brand, product, and file names are fine.
 
 To bundle only what the OBS PC needs:
 
