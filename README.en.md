@@ -86,7 +86,6 @@ window.__zuicyArtistImages = {
 ## Known issues
 
 - Fixed at 460 × 120
-- Not tested in OBS on Windows yet
 - On Cider builds with only the v1 API, the console keeps logging a v2 404 warning (harmless)
 
 ## Development
