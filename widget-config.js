@@ -1,0 +1,1 @@
+window.__zuicyConfig = { "host": "localhost:10767", "token": "", "bg": "art", "font": "" };

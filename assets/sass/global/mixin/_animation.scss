@@ -1,0 +1,20 @@
+// e.g.
+// element {
+//   background-color: #ccc;
+//
+//   &.animate {  
+//     background-color: #0086cc;
+//   }
+//
+//   @include animate {
+//     transition: background-color 300ms ease;
+//   }
+// }
+// 最終状態を指定した後、animate mixinを使ってアニメーションを適用
+
+// base animate rule
+@mixin animate {
+  @media (prefers-reduced-motion: no-preference) {
+    @content;
+  }
+}

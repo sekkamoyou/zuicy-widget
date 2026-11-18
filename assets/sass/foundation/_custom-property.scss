@@ -1,0 +1,8 @@
+@use "../global" as *;
+
+:root {
+  --background: #{$color-widget-background};
+  --primary: #{$color-widget-primary};
+  --secondary: #{$color-widget-secondary};
+  --progress-track: #{$color-widget-progress-track};
+}

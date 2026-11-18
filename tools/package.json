@@ -1,0 +1,11 @@
+{
+  "name": "zuicy-dev-tools",
+  "private": true,
+  "description": "Cider RPC 모의 서버 등 개발 전용 도구. 위젯 배포물과 무관하다.",
+  "scripts": {
+    "mock": "node mock-cider.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  }
+}

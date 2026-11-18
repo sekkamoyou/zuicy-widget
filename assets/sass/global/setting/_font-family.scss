@@ -1,0 +1,14 @@
+@font-face {
+  font-family: "Pretendard JP Variable";
+  src: url("../fonts/PretendardJPVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+}
+
+$font-family-base:
+  "Pretendard JP Variable",
+  "Segoe UI", "Yu Gothic UI", "Malgun Gothic",
+  -apple-system, "Hiragino Kaku Gothic ProN", "Apple SD Gothic Neo",
+  sans-serif;
+$font-family-dashboard: $font-family-base;
+
+// Optional Korean stylistic set: font-feature-settings: "ss05";

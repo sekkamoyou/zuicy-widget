@@ -1,0 +1,271 @@
+@use "../../global" as *;
+
+.c-nowplaying {
+  display: flex;
+  width: 460px;
+  min-height: 120px;
+  align-items: center;
+  gap: 14px;
+  padding: 0 12px 0 0;
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+  color: var(--primary);
+  background: var(--background);
+  opacity: 1;
+  transform: rotateY(0);
+  transform-origin: left center;
+  transition: transform $dur-enter $ease-enter, opacity 10ms linear, background-color $dur-enter $ease-enter, color $dur-enter $ease-enter;
+
+  &.is-hidden {
+    opacity: 0;
+    transform: rotateY(-80deg);
+    pointer-events: none;
+    transition: transform $dur-exit $ease-exit, opacity 10ms linear ($dur-exit - 10ms), background-color $dur-enter $ease-enter, color $dur-enter $ease-enter;
+  }
+
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    .backdrop-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity $dur-enter $ease-enter;
+
+      &.is-active {
+        z-index: 1;
+        opacity: 1;
+      }
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.35));
+    }
+  }
+
+  .artwork {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    flex: 0 0 120px;
+    overflow: hidden;
+    border-radius: 0;
+    background: transparent;
+    perspective: 600px;
+    z-index: 1;
+  }
+
+  .artwork-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    backface-visibility: hidden;
+    transform-origin: center center;
+
+    &:not(.is-active) {
+      animation: tile-flip-back $dur-enter $ease-enter both;
+    }
+
+    &.is-active {
+      z-index: 1;
+      animation: tile-flip-front $dur-enter $ease-enter both;
+    }
+  }
+
+  .details {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    gap: 7px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .track-copy {
+    min-width: 0;
+
+    &.is-changing {
+      .title {
+        animation: copy-enter $dur-enter $ease-enter both;
+      }
+
+      .artist {
+        animation: copy-enter $dur-enter $ease-enter $stagger both;
+      }
+    }
+  }
+
+  .line {
+    overflow: hidden;
+    white-space: nowrap;
+    margin-left: -14px;
+    margin-right: -12px;
+    padding-left: 14px;
+
+    &.is-overflowing .marquee-content {
+      min-width: auto;
+      animation: marquee var(--marquee-duration, 8s) linear 700ms infinite alternate;
+    }
+  }
+
+  .marquee-content {
+    display: inline-block;
+    min-width: 100%;
+    padding-right: 0;
+  }
+
+  .title {
+    font-size: 22px;
+    font-weight: 350;
+    line-height: 1.2;
+    letter-spacing: 0;
+    color: var(--primary);
+    transition: color $dur-enter $ease-enter;
+  }
+
+  .artist {
+    margin-top: 3px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--secondary);
+    transition: color $dur-enter $ease-enter;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .progress {
+    flex: 1;
+    height: 3px;
+    background: var(--progress-track);
+    transition: background-color $dur-enter $ease-enter;
+  }
+
+  .progress-fill {
+    position: relative;
+    width: 0;
+    height: 100%;
+    background: var(--primary);
+    transform-origin: left center;
+    transition: background-color $dur-enter $ease-enter;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -6px;
+      width: 12px;
+      height: 12px;
+      box-sizing: border-box;
+      transform: translateY(-50%);
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      background: var(--background);
+      transition: border-color $dur-enter $ease-enter, background-color $dur-enter $ease-enter;
+    }
+  }
+
+  .time {
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--secondary);
+    transition: color $dur-enter $ease-enter;
+  }
+
+  &.bg-art .backdrop-image {
+    transform: scale(1.35);
+    filter: blur(24px) saturate(1.2);
+  }
+
+  &.has-backdrop {
+    .title {
+      color: #fff;
+    }
+
+    .artist,
+    .time {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
+    .progress {
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .progress-fill {
+      background: #fff;
+
+      &::after {
+        border-color: #fff;
+      }
+    }
+  }
+}
+
+@keyframes tile-flip-front {
+  0% {
+    transform: rotateX(-180deg);
+  }
+
+  70% {
+    transform: rotateX(6deg);
+  }
+
+  100% {
+    transform: rotateX(0);
+  }
+}
+
+@keyframes tile-flip-back {
+  0% {
+    transform: rotateX(0);
+  }
+
+  70% {
+    transform: rotateX(186deg);
+  }
+
+  100% {
+    transform: rotateX(180deg);
+  }
+}
+
+@keyframes copy-enter {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes marquee {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+
+  88%,
+  100% {
+    transform: translateX(var(--marquee-distance));
+  }
+}

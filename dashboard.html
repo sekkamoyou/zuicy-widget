@@ -1,0 +1,1041 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zuicy dashboard</title>
+  <meta name="description" content="zuicy — Cider용 OBS Now Playing 위젯 대시보드">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="l-container">
+    <div class="l-container__inner">
+      <main class="l-main">
+        <div class="l-main__inner">
+          <section class="c-dashboard" aria-labelledby="dashboard-title">
+            <p class="c-dashboard__app-title">ZUICY</p>
+            <h1 id="dashboard-title" class="c-dashboard__title">now playing</h1>
+          </section>
+          <div class="c-dashboard__grid">
+              <section class="c-dashboard__panel c-dashboard__panel--stack" aria-label="미리보기와 재생 정보">
+                <div class="c-dashboard__group" aria-labelledby="preview-title">
+                  <h2 id="preview-title" class="c-dashboard__heading">라이브 미리보기</h2>
+                  <div class="c-dashboard__preview">
+                    <iframe id="widget-preview" src="index.html" width="460" height="120" title="Now Playing 위젯 미리보기"></iframe>
+                  </div>
+                </div>
+                <div class="c-dashboard__group c-dashboard__now-playing" aria-labelledby="now-playing-title">
+                  <h2 id="now-playing-title" class="c-dashboard__subheading">지금 재생 중</h2>
+                  <p id="now-playing-track" class="c-dashboard__track">재생 정보 없음</p>
+                  <p id="now-playing-meta" class="c-dashboard__track-meta"></p>
+                  <span id="playback-status" class="c-dashboard__badge is-offline">연결 끊김</span>
+                </div>
+              </section>
+
+              <section class="c-dashboard__panel c-dashboard__panel--stack" aria-labelledby="connection-title">
+                <h2 id="connection-title" class="c-dashboard__heading">연결</h2>
+                <form id="connection-form">
+                  <div class="c-dashboard__field">
+                    <label for="host">호스트</label>
+                    <input id="host" name="host" type="text" value="localhost:10767" autocomplete="off">
+                  </div>
+                  <div class="c-dashboard__field">
+                    <label for="token">토큰</label>
+                    <input id="token" name="token" type="text" autocomplete="off">
+                  </div>
+                </form>
+                <div class="c-dashboard__diagnostic" aria-label="연결 진단">
+                  <span id="socket-status" class="c-dashboard__badge is-offline">연결 끊김</span>
+                  <p id="api-status" class="c-dashboard__message">확인 대기 중입니다.</p>
+                  <button id="refresh-diagnostics" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="m16 5 3 3-3 3"/></svg>다시 확인</button>
+                </div>
+              </section>
+
+              <section class="c-dashboard__panel c-dashboard__panel--stack" aria-labelledby="widget-settings-title">
+                <h2 id="widget-settings-title" class="c-dashboard__heading">위젯 설정</h2>
+                <div class="c-dashboard__field">
+                  <label for="bg-mode">배경 모드</label>
+                  <select id="bg-mode" name="bg-mode">
+                    <option value="art">앨범아트 확대</option>
+                    <option value="artist">아티스트 사진</option>
+                    <option value="accent">악센트 컬러</option>
+                  </select>
+                </div>
+                <div class="c-dashboard__field">
+                  <label for="font">폰트</label>
+                  <input id="font" name="font" type="text" placeholder="OBS PC에 설치된 폰트 이름" autocomplete="off">
+                </div>
+                <div class="c-dashboard__actions">
+                  <button id="connect-folder" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v10H3z"/></svg>위젯 폴더 연결</button>
+                  <button id="download-config" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>설정 파일 다운로드</button>
+                  <p id="folder-status" class="c-dashboard__message">연결·위젯 설정이 함께 저장됩니다.</p>
+                </div>
+                <div class="c-dashboard__disclosure">
+                  <button class="c-dashboard__disclosure-summary" type="button" aria-expanded="false">
+                    OBS 등록 방법
+                    <svg class="c-dashboard__disclosure-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+                  </button>
+                  <div class="c-dashboard__disclosure-body" hidden>
+                    <div class="c-dashboard__url">
+                      <ol>
+                        <li><span>01</span><p>브라우저 소스를 추가하고 <strong>로컬 파일</strong>을 체크합니다.</p></li>
+                        <li><span>02</span><p>이 폴더의 <code>index.html</code>을 선택합니다.</p></li>
+                        <li><span>03</span><p>크기를 <strong>460 × 120</strong>으로 설정합니다.</p></li>
+                      </ol>
+                      <small>고급: http로 서빙하는 경우에만 URL 방식을 사용합니다.</small>
+                      <small>문제 확인이 필요하면 설정 파일에 <code>"debug": true</code>를 넣으세요.</small>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+
+              <section class="c-dashboard__panel" aria-labelledby="artist-images-title">
+                <h2 id="artist-images-title" class="c-dashboard__heading">아티스트 이미지</h2>
+                <div id="artist-images-unavailable" class="c-dashboard__message">위젯 폴더 연결이 필요합니다.</div>
+                <div id="artist-images-content" hidden>
+                  <div class="c-dashboard__field">
+                    <label for="artist-manual">아티스트</label>
+                    <div class="c-dashboard__artist-add">
+                      <input id="artist-manual" type="text" placeholder="아티스트 이름" autocomplete="off">
+                      <button id="artist-add" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4v16"/><path d="M4 12h16"/></svg>추가</button>
+                    </div>
+                  </div>
+                  <input id="artist-file-input" type="file" accept="image/*" hidden>
+                  <div id="artist-list" class="c-dashboard__artist-list"></div>
+                  <datalist id="artist-suggestions"></datalist>
+                </div>
+              </section>
+
+              <section id="up-next-panel" class="c-dashboard__panel" aria-labelledby="up-next-title" hidden>
+                <h2 id="up-next-title" class="c-dashboard__heading">다음 곡</h2>
+                <ol id="up-next-list" class="c-dashboard__queue"></ol>
+              </section>
+            </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <footer class="c-dashboard__copyright">© 2026 zuicy</footer>
+
+  <script src="assets/js/socket.io.min.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const DB_NAME = "zuicy-dashboard";
+      const DB_STORE = "handles";
+      const SETTINGS_STORAGE = "zuicy-dashboard-settings";
+      const ARTISTS_STORAGE = "zuicy-dashboard-artists";
+      const MANIFEST_STORAGE = "zuicy-dashboard-manifest";
+      const CONFIG_FILE = "widget-config.json";
+      const CONFIG_SCRIPT_FILE = "widget-config.js";
+      const ARTIST_DIRECTORY = "artist-images";
+      const MANIFEST_FILE = "index.json";
+      const MANIFEST_SCRIPT_FILE = "index.js";
+      const hostInput = document.getElementById("host");
+      const tokenInput = document.getElementById("token");
+      const bgModeInput = document.getElementById("bg-mode");
+      const fontInput = document.getElementById("font");
+      const preview = document.getElementById("widget-preview");
+      const disclosureSummary = document.querySelector(".c-dashboard__disclosure-summary");
+      const disclosureBody = document.querySelector(".c-dashboard__disclosure-body");
+      const grid = document.querySelector(".c-dashboard__grid");
+      const connectFolderButton = document.getElementById("connect-folder");
+      const downloadConfigButton = document.getElementById("download-config");
+      const folderStatus = document.getElementById("folder-status");
+      const socketStatus = document.getElementById("socket-status");
+      const apiStatus = document.getElementById("api-status");
+      const nowPlayingTrack = document.getElementById("now-playing-track");
+      const nowPlayingMeta = document.getElementById("now-playing-meta");
+      const playbackStatus = document.getElementById("playback-status");
+      const refreshDiagnosticsButton = document.getElementById("refresh-diagnostics");
+      const artistUnavailable = document.getElementById("artist-images-unavailable");
+      const artistContent = document.getElementById("artist-images-content");
+      const artistManualInput = document.getElementById("artist-manual");
+      const artistAddButton = document.getElementById("artist-add");
+      const artistFileInput = document.getElementById("artist-file-input");
+      const artistList = document.getElementById("artist-list");
+      const upNextPanel = document.getElementById("up-next-panel");
+      const upNextList = document.getElementById("up-next-list");
+
+      let directoryHandle = null;
+      let artistDirectoryHandle = null;
+      let artistManifest = {};
+      let artistAliases = {};
+      let dashboardSocket = null;
+      let diagnosticTimer = null;
+      let queueTimer = null;
+      let queueRefreshTimer = null;
+      let configDebug = false;
+      const artists = new Map();
+      let socketConnected = false;
+      let restDiagnostic = "REST 확인 대기 중입니다.";
+      let restAvailable = false;
+      let previewArtistSyncTimer = null;
+      let wheelAccum = 0;
+      let wheelLock = false;
+      let scrollbarIdleTimer = null;
+      let expandedArtistKey = null;
+
+      function normalizeName(value) {
+        return String(value || "").toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^\p{L}\p{N}]+/gu, " ")
+          .trim();
+      }
+
+      function primaryArtistKey(value) {
+        return normalizeName(String(value || "").replace(/\s+(?:feat(?:uring)?|ft|with|vs)\.?\s+.*/i, ""));
+      }
+
+      function artistFilename(key) {
+        return `${key.replace(/\s+/g, "-")}.jpg`;
+      }
+
+      function parseArtistManifest(value) {
+        if (!value || typeof value !== "object" || Array.isArray(value)) return { images: {}, aliases: {} };
+        const images = value.images && typeof value.images === "object" && !Array.isArray(value.images)
+          ? value.images
+          : value;
+        const aliases = value.images && typeof value.aliases === "object" && !Array.isArray(value.aliases)
+          ? value.aliases
+          : {};
+        return {
+          images: Object.fromEntries(Object.entries(images).filter(([key, filename]) => typeof key === "string" && typeof filename === "string")),
+          aliases: Object.fromEntries(Object.entries(aliases).filter(([key, primary]) => typeof key === "string" && typeof primary === "string")),
+        };
+      }
+
+      function artistMatches(result, query) {
+        return Boolean(result?.name) && normalizeName(result.name) === normalizeName(query);
+      }
+
+      function settings() {
+        return {
+          host: hostInput.value.trim() || "localhost:10767",
+          token: tokenInput.value.trim(),
+          bg: bgModeInput.value,
+          font: fontInput.value.trim(),
+          ...(configDebug ? { debug: true } : {}),
+        };
+      }
+
+      function applySettings(config) {
+        if (!config || typeof config !== "object") return;
+        if (typeof config.host === "string") hostInput.value = config.host;
+        if (typeof config.token === "string") tokenInput.value = config.token;
+        if (["art", "artist", "accent"].includes(config.bg)) bgModeInput.value = config.bg;
+        if (typeof config.font === "string") fontInput.value = config.font;
+        configDebug = config.debug === true;
+      }
+
+      function flashSetting(target) {
+        const field = target?.closest?.(".c-dashboard__field");
+        if (!field) return;
+        field.classList.remove("is-saved");
+        requestAnimationFrame(() => field.classList.add("is-saved"));
+        setTimeout(() => field.classList.remove("is-saved"), 200);
+      }
+
+      function attachTilt(el) {
+        el.style.transformOrigin = "center";
+        el.addEventListener("pointerdown", event => {
+          const rect = el.getBoundingClientRect();
+          const dx = (event.clientX - rect.left) / rect.width - 0.5;
+          const dy = (event.clientY - rect.top) / rect.height - 0.5;
+          el.style.transform = `perspective(600px) rotateY(${dx * 10}deg) rotateX(${-dy * 10}deg) scale(0.985)`;
+        });
+        ["pointerup", "pointerleave", "pointercancel"].forEach(type =>
+          el.addEventListener(type, () => { el.style.transform = ""; }),
+        );
+      }
+
+      function readMirror(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+
+      function writeMirror(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch {
+          // localStorage is only a dashboard bootstrap cache.
+        }
+      }
+
+      function persistSettings() {
+        const { host, token, bg, font } = settings();
+        writeMirror(SETTINGS_STORAGE, { host, token, bg, font });
+      }
+
+      function restoreMirrors() {
+        applySettings(readMirror(SETTINGS_STORAGE, {}));
+        const manifest = parseArtistManifest(readMirror(MANIFEST_STORAGE, {}));
+        artistManifest = manifest.images;
+        artistAliases = manifest.aliases;
+        for (const artist of readMirror(ARTISTS_STORAGE, [])) {
+          if (artist && typeof artist.name === "string") {
+            const key = normalizeName(artist.name);
+            if (!artistAliases[key]) artists.set(key, { name: artist.name });
+          }
+        }
+        artistContent.hidden = false;
+        renderArtistList();
+      }
+
+      function persistArtists() {
+        writeMirror(ARTISTS_STORAGE, [...artists.entries()]
+          .filter(([key]) => !artistAliases[key])
+          .map(([, artist]) => artist)
+          .slice(-50));
+      }
+
+      function persistArtistManifest() {
+        writeMirror(MANIFEST_STORAGE, { images: artistManifest, aliases: artistAliases });
+      }
+
+      function baseUrl() {
+        return `http://${settings().host.replace(/^https?:\/\//, "").replace(/\/$/, "")}`;
+      }
+
+      function updateWidgetUrl() {
+        const url = new URL("index.html", location.href).href;
+        if (preview.src !== url) preview.src = url;
+      }
+
+      function toggleDisclosure() {
+        const expanded = disclosureSummary.getAttribute("aria-expanded") !== "true";
+        disclosureSummary.setAttribute("aria-expanded", String(expanded));
+        disclosureSummary.closest(".c-dashboard__disclosure").classList.toggle("is-expanded", expanded);
+        disclosureBody.hidden = !expanded;
+        disclosureBody.inert = !expanded;
+        disclosureBody.setAttribute("aria-hidden", String(!expanded));
+      }
+
+      function sendPreviewConfig() {
+        preview.contentWindow?.postMessage({ type: "zuicy:config", config: settings() }, "*");
+      }
+
+      async function sendPreviewArtistImagesNow() {
+        if (!directoryHandle || !await ensureDirectoryPermission(false)) return;
+        const directory = await ensureArtistDirectory();
+        const dataUrls = {};
+        for (const [name, filename] of Object.entries(artistManifest)) {
+          try {
+            const file = await (await directory.getFileHandle(filename)).getFile();
+            dataUrls[name] = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          } catch {
+            // Ignore a manifest entry whose image was removed outside the dashboard.
+          }
+        }
+        for (const [alias, primary] of Object.entries(artistAliases)) {
+          if (dataUrls[primary]) dataUrls[alias] = dataUrls[primary];
+        }
+        preview.contentWindow?.postMessage({ type: "zuicy:artist-images", manifest: dataUrls }, "*");
+      }
+
+      function sendPreviewArtistImages() {
+        clearTimeout(previewArtistSyncTimer);
+        previewArtistSyncTimer = setTimeout(() => {
+          sendPreviewArtistImagesNow();
+        }, 300);
+      }
+
+      function syncPreviewBridge() {
+        sendPreviewConfig();
+        sendPreviewArtistImages();
+      }
+
+      function setFolderStatus(message) {
+        folderStatus.textContent = message;
+      }
+
+      function openDatabase() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, 1);
+          request.onupgradeneeded = () => request.result.createObjectStore(DB_STORE);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+      }
+
+      async function storedDirectoryHandle() {
+        const database = await openDatabase();
+        return new Promise((resolve, reject) => {
+          const request = database.transaction(DB_STORE).objectStore(DB_STORE).get("widget-directory");
+          request.onsuccess = () => resolve(request.result || null);
+          request.onerror = () => reject(request.error);
+        });
+      }
+
+      async function storeDirectoryHandle(handle) {
+        const database = await openDatabase();
+        await new Promise((resolve, reject) => {
+          const request = database.transaction(DB_STORE, "readwrite").objectStore(DB_STORE).put(handle, "widget-directory");
+          request.onsuccess = resolve;
+          request.onerror = () => reject(request.error);
+        });
+      }
+
+      async function ensureDirectoryPermission(request) {
+        if (!directoryHandle) return false;
+        const options = { mode: "readwrite" };
+        const permission = request
+          ? await directoryHandle.requestPermission(options)
+          : await directoryHandle.queryPermission(options);
+        return permission === "granted";
+      }
+
+      async function ensureArtistDirectory() {
+        if (!directoryHandle) return null;
+        artistDirectoryHandle = await directoryHandle.getDirectoryHandle(ARTIST_DIRECTORY, { create: true });
+        return artistDirectoryHandle;
+      }
+
+      async function writeFile(handle, content) {
+        const writable = await handle.createWritable();
+        await writable.write(content);
+        await writable.close();
+      }
+
+      async function loadSettingsFile() {
+        try {
+          const handle = await directoryHandle.getFileHandle(CONFIG_FILE);
+          applySettings(JSON.parse(await (await handle.getFile()).text()));
+          persistSettings();
+        } catch {
+          // A connected folder may not have a configuration file yet.
+        }
+      }
+
+      async function loadArtistManifest() {
+        if (!directoryHandle || !await ensureDirectoryPermission(false)) return;
+        const directory = await ensureArtistDirectory();
+        try {
+          const handle = await directory.getFileHandle(MANIFEST_FILE);
+          const manifest = parseArtistManifest(JSON.parse(await (await handle.getFile()).text()));
+          artistManifest = manifest.images;
+          artistAliases = manifest.aliases;
+        } catch {
+          artistManifest = {};
+          artistAliases = {};
+        }
+        for (const key of Object.keys(artistManifest)) {
+          if (!artists.has(key)) artists.set(key, { name: key });
+        }
+        persistArtists();
+        persistArtistManifest();
+        renderArtistList();
+        syncPreviewBridge();
+      }
+
+      async function writeArtistManifest() {
+        const directory = await ensureArtistDirectory();
+        const manifest = { images: artistManifest, aliases: artistAliases };
+        await Promise.all([
+          directory.getFileHandle(MANIFEST_FILE, { create: true })
+            .then(handle => writeFile(handle, JSON.stringify(manifest, null, 2))),
+          directory.getFileHandle(MANIFEST_SCRIPT_FILE, { create: true })
+            .then(handle => writeFile(handle, `window.__zuicyArtistImages = ${JSON.stringify(manifest)};\n`)),
+        ]);
+        persistArtistManifest();
+      }
+
+      async function saveSettings() {
+        persistSettings();
+        updateWidgetUrl();
+        syncPreviewBridge();
+        connectDashboardSocket();
+        refreshDiagnostics();
+        refreshQueue();
+        if (!directoryHandle || !await ensureDirectoryPermission(false)) return;
+        try {
+          const config = settings();
+          await Promise.all([
+            directoryHandle.getFileHandle(CONFIG_FILE, { create: true })
+              .then(handle => writeFile(handle, JSON.stringify(config, null, 2))),
+            directoryHandle.getFileHandle(CONFIG_SCRIPT_FILE, { create: true })
+              .then(handle => writeFile(handle, `window.__zuicyConfig = ${JSON.stringify(config)};\n`)),
+          ]);
+          setFolderStatus("widget-config.json과 widget-config.js가 저장되었습니다 — 위젯에 3초 내 반영됩니다.");
+        } catch (error) {
+          setFolderStatus(`설정 저장에 실패했습니다: ${error.message}`);
+        }
+      }
+
+      async function activateFolderState() {
+        await loadSettingsFile();
+        await loadArtistManifest();
+        artistUnavailable.hidden = true;
+        artistContent.hidden = false;
+        updateWidgetUrl();
+        syncPreviewBridge();
+        connectDashboardSocket();
+        refreshDiagnostics();
+        refreshQueue();
+      }
+
+      async function connectFolder() {
+        if (!window.showDirectoryPicker) {
+          setFolderStatus("이 브라우저는 폴더 연결을 지원하지 않습니다. 설정 파일 다운로드를 사용하세요.");
+          return;
+        }
+        try {
+          if (!directoryHandle) {
+            directoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+            await storeDirectoryHandle(directoryHandle);
+          }
+          if (!await ensureDirectoryPermission(true)) throw new Error("쓰기 권한이 필요합니다.");
+          await activateFolderState();
+          setFolderStatus("위젯 폴더가 연결되었습니다.");
+        } catch (error) {
+          setFolderStatus(`폴더 연결이 취소되었거나 실패했습니다: ${error.message}`);
+        }
+      }
+
+      async function restoreFolder() {
+        if (!window.showDirectoryPicker || !window.indexedDB) return;
+        try {
+          directoryHandle = await storedDirectoryHandle();
+          if (!directoryHandle) return;
+          if (!await ensureDirectoryPermission(false)) {
+            artistUnavailable.hidden = false;
+            artistUnavailable.textContent = "위젯 폴더를 다시 연결하면 썸네일이 표시됩니다.";
+            setFolderStatus("위젯 폴더를 다시 연결해야 합니다.");
+            return;
+          }
+          await activateFolderState();
+          setFolderStatus("이전에 연결한 위젯 폴더를 사용 중입니다.");
+        } catch {
+          directoryHandle = null;
+        }
+      }
+
+      function downloadFile(filename, content, type) {
+        const url = URL.createObjectURL(new Blob([content], { type }));
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = filename;
+        anchor.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function downloadConfig() {
+        const config = settings();
+        downloadFile(CONFIG_FILE, JSON.stringify(config, null, 2), "application/json");
+        downloadFile(CONFIG_SCRIPT_FILE, `window.__zuicyConfig = ${JSON.stringify(config)};\n`, "text/javascript");
+        setFolderStatus("widget-config.json과 widget-config.js를 다운로드했습니다. index.html 옆에 함께 넣으세요.");
+      }
+
+
+      function renderDiagnostics() {
+        if (socketConnected) {
+          apiStatus.textContent = restAvailable
+            ? `Cider 연결됨 — ${restDiagnostic}`
+            : "Cider 연결됨 — REST 접근 차단됨: 브라우저 보안(CORS) 때문일 수 있으며 OBS 위젯 동작에는 영향 없습니다.";
+          return;
+        }
+        apiStatus.textContent = restAvailable ? restDiagnostic : "Cider 미연결";
+      }
+
+      function setPlaybackSummary(track) {
+        if (!track?.name) return;
+        nowPlayingTrack.textContent = track.name;
+        nowPlayingMeta.textContent = [track.artistName, track.albumName].filter(Boolean).join(" · ");
+      }
+
+      function setPlaybackStatus(state) {
+        const isPlaying = state === "playing";
+        const isPaused = state === "paused";
+        playbackStatus.textContent = isPlaying ? "재생 중" : isPaused ? "일시정지" : "연결 끊김";
+        playbackStatus.classList.toggle("is-online", isPlaying);
+        playbackStatus.classList.toggle("is-offline", !isPlaying);
+      }
+
+      function setSocketStatus(connected) {
+        socketConnected = connected;
+        socketStatus.textContent = connected ? "연결됨" : "연결 끊김";
+        socketStatus.classList.toggle("is-online", connected);
+        socketStatus.classList.toggle("is-offline", !connected);
+        if (!connected) setPlaybackStatus("stopped");
+        renderDiagnostics();
+      }
+
+      function unwrap(value) {
+        return value && typeof value === "object" ? (value.attributes ?? value.info ?? value.data ?? value) : value;
+      }
+
+      function rememberArtist(name) {
+        const key = normalizeName(name);
+        if (!key || artistAliases[key]) return;
+        artists.set(key, { name });
+        while (artists.size > 50) artists.delete(artists.keys().next().value);
+        persistArtists();
+        renderArtistList();
+      }
+
+      function connectDashboardSocket() {
+        if (typeof io !== "function") return;
+        if (dashboardSocket) dashboardSocket.disconnect();
+        dashboardSocket = io(baseUrl(), { transports: ["websocket", "polling"], reconnectionDelay: 1000 });
+        dashboardSocket.on("connect", () => setSocketStatus(true));
+        dashboardSocket.on("disconnect", () => setSocketStatus(false));
+        dashboardSocket.on("connect_error", () => setSocketStatus(false));
+        dashboardSocket.on("API:Playback", message => {
+          if (!message || typeof message !== "object") return;
+          if (message.type === "playbackStatus.nowPlayingItemDidChange") {
+            const track = unwrap(message.data);
+            setPlaybackSummary(track);
+            rememberArtist(track?.artistName);
+            scheduleQueueRefresh();
+          } else if (message.type === "playbackStatus.playbackStateDidChange") {
+            setPlaybackStatus(message.data?.state);
+          } else if (message.type === "playbackStatus.playbackTimeDidChange") {
+            setPlaybackStatus(message.data?.isPlaying ? "playing" : "paused");
+          } else if (message.type === "queueStatus.queueChanged") {
+            scheduleQueueRefresh();
+          }
+        });
+      }
+
+      async function apiFetch(path) {
+        const config = settings();
+        const options = { cache: "no-store", headers: {} };
+        if (config.token) options.headers.apptoken = config.token;
+        return fetch(`${baseUrl()}${path}`, options);
+      }
+
+      async function refreshDiagnostics() {
+        restAvailable = false;
+        try {
+          const v2 = await apiFetch("/api/v2/playback");
+          if (v2.status === 200) {
+            restAvailable = true;
+            restDiagnostic = "REST API가 정상입니다 (v2, 토큰 정상)";
+            renderDiagnostics();
+            return;
+          }
+          if (v2.status === 401) {
+            restAvailable = true;
+            restDiagnostic = "REST API가 응답합니다 (v2, 토큰 필요 — Cider 설정에서 해제하거나 token 입력)";
+            renderDiagnostics();
+            return;
+          }
+          const v1 = await apiFetch("/api/v1/playback/active");
+          if (v1.status === 204) {
+            restAvailable = true;
+            restDiagnostic = "REST API가 정상입니다 (v1, 토큰 정상)";
+          } else if (v1.status === 401) {
+            restAvailable = true;
+            restDiagnostic = "REST API가 응답합니다 (v1, 토큰 필요 — Cider 설정에서 해제하거나 token 입력)";
+          }
+        } catch {
+          // file:// pages can be blocked by CORS even when Cider is available.
+        }
+        renderDiagnostics();
+      }
+
+      function trackFromQueueItem(item) {
+        const track = unwrap(item);
+        return track?.name ? track : null;
+      }
+
+      function findQueueArray(value, depth = 0) {
+        if (Array.isArray(value)) return value;
+        if (!value || typeof value !== "object" || depth > 3) return [];
+        for (const nested of Object.values(value)) {
+          const found = findQueueArray(nested, depth + 1);
+          if (found.length) return found;
+        }
+        return [];
+      }
+
+      async function refreshQueue() {
+        try {
+          const response = await apiFetch("/api/v1/playback/queue");
+          if (!response.ok) throw new Error(`queue: ${response.status}`);
+          const payload = await response.json();
+          const tracks = findQueueArray(unwrap(payload)).map(trackFromQueueItem).filter(Boolean).slice(0, 3);
+          if (!tracks.length) throw new Error("queue payload has no tracks");
+          upNextList.replaceChildren(...tracks.map(track => {
+            const item = document.createElement("li");
+            item.innerHTML = `<strong></strong><span></span>`;
+            item.querySelector("strong").textContent = track.name;
+            item.querySelector("span").textContent = track.artistName || "";
+            return item;
+          }));
+          upNextPanel.hidden = false;
+        } catch (error) {
+          console.debug("Up Next unavailable", error);
+          upNextPanel.hidden = true;
+        }
+      }
+
+      function scheduleQueueRefresh() {
+        clearTimeout(queueRefreshTimer);
+        queueRefreshTimer = setTimeout(refreshQueue, 500);
+      }
+
+      function deezerSearchArtist(name) {
+        return new Promise(resolve => {
+          const callback = `__dashboardDz${Math.floor(performance.now() * 1000)}`;
+          const script = document.createElement("script");
+          const timer = setTimeout(() => finish(null), 4000);
+          function finish(result) {
+            clearTimeout(timer);
+            delete window[callback];
+            script.remove();
+            resolve(result);
+          }
+          window[callback] = data => finish(data?.data?.[0] ?? null);
+          script.onerror = () => finish(null);
+          script.src = `https://api.deezer.com/search/artist?q=${encodeURIComponent(name)}&limit=1&output=jsonp&callback=${callback}`;
+          document.head.append(script);
+        });
+      }
+
+      async function findArtistImage(name) {
+        let query = name;
+        let result = await deezerSearchArtist(query);
+        if (!artistMatches(result, query)) {
+          const fallback = name.split(/,|&|\s+feat\./i)[0].trim();
+          if (!fallback || fallback === name) return null;
+          query = fallback;
+          result = await deezerSearchArtist(query);
+        }
+        return artistMatches(result, query) ? (result.picture_xl || result.picture_big || null) : null;
+      }
+
+      function aliasesFor(primaryKey) {
+        return Object.keys(artistAliases).filter(alias => artistAliases[alias] === primaryKey);
+      }
+
+      async function copyArtistFile(directory, sourceFilename, destinationFilename) {
+        const source = await (await directory.getFileHandle(sourceFilename)).getFile();
+        const destination = await directory.getFileHandle(destinationFilename, { create: true });
+        await writeFile(destination, source);
+      }
+
+      async function syncAliasFiles(primaryKey) {
+        const sourceFilename = artistManifest[primaryKey];
+        if (!sourceFilename) return;
+        const directory = await ensureArtistDirectory();
+        await Promise.all(aliasesFor(primaryKey).map(alias =>
+          copyArtistFile(directory, sourceFilename, artistFilename(alias)),
+        ));
+      }
+
+      async function saveArtistBlob(name, blob) {
+        if (!directoryHandle || !await ensureDirectoryPermission(false)) throw new Error("위젯 폴더 연결이 필요합니다.");
+        const key = normalizeName(name);
+        if (!key) throw new Error("유효한 아티스트명이 필요합니다.");
+        const directory = await ensureArtistDirectory();
+        const filename = artistFilename(key);
+        await writeFile(await directory.getFileHandle(filename, { create: true }), blob);
+        artistManifest[key] = filename;
+        await syncAliasFiles(key);
+        await writeArtistManifest();
+        renderArtistList();
+        sendPreviewArtistImages();
+      }
+
+      async function addArtistAlias(primaryKey, name) {
+        const aliasKey = primaryArtistKey(name);
+        if (!artistManifest[primaryKey]) throw new Error("사진을 먼저 저장하세요.");
+        if (!aliasKey || aliasKey === primaryKey) throw new Error("주 아티스트와 다른 이름을 입력하세요.");
+        if (artistManifest[aliasKey] || artistAliases[aliasKey]) throw new Error("이미 저장되었거나 다른 별칭으로 사용 중인 이름입니다.");
+        const directory = await ensureArtistDirectory();
+        await copyArtistFile(directory, artistManifest[primaryKey], artistFilename(aliasKey));
+        artistAliases[aliasKey] = primaryKey;
+        artists.delete(aliasKey);
+        await writeArtistManifest();
+        persistArtists();
+        renderArtistList();
+        sendPreviewArtistImages();
+      }
+
+      async function deleteArtistAlias(aliasKey) {
+        const primaryKey = artistAliases[aliasKey];
+        if (!primaryKey || !directoryHandle) return;
+        const directory = await ensureArtistDirectory();
+        await directory.removeEntry(artistFilename(aliasKey));
+        delete artistAliases[aliasKey];
+        await writeArtistManifest();
+        persistArtists();
+        renderArtistList();
+        sendPreviewArtistImages();
+      }
+
+      async function saveArtistFromDeezer(key) {
+        const artist = artists.get(key);
+        if (!artist) return;
+        try {
+          const url = await findArtistImage(artist.name);
+          if (!url) throw new Error("완전 일치 아티스트 사진을 찾지 못했습니다.");
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`이미지 요청에 실패했습니다: ${response.status}`);
+          await saveArtistBlob(artist.name, await response.blob());
+          setFolderStatus(`${artist.name} 이미지가 저장되었습니다.`);
+        } catch (error) {
+          setFolderStatus(error.message);
+        }
+      }
+
+      async function replaceArtistFromUrl(key) {
+        const artist = artists.get(key);
+        if (!artist) return;
+        const url = window.prompt("이미지 URL", "");
+        if (!url) return;
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`이미지 요청에 실패했습니다: ${response.status}`);
+          await saveArtistBlob(artist.name, await response.blob());
+        } catch {
+          setFolderStatus("URL 이미지 다운로드에 실패했습니다 — CORS를 허용하는 URL인지 확인하세요.");
+        }
+      }
+
+      async function deleteArtistImage(key) {
+        const filename = artistManifest[key];
+        if (!filename || !directoryHandle) return;
+        try {
+          const directory = await ensureArtistDirectory();
+          for (const alias of aliasesFor(key)) {
+            await directory.removeEntry(artistFilename(alias));
+            delete artistAliases[alias];
+          }
+          await directory.removeEntry(filename);
+          delete artistManifest[key];
+          await writeArtistManifest();
+          persistArtists();
+          renderArtistList();
+          sendPreviewArtistImages();
+        } catch (error) {
+          setFolderStatus(`이미지 삭제에 실패했습니다: ${error.message}`);
+        }
+      }
+
+      async function setArtistThumbnail(image, filename) {
+        try {
+          const directory = await ensureArtistDirectory();
+          const file = await (await directory.getFileHandle(filename)).getFile();
+          image.src = URL.createObjectURL(file);
+        } catch {
+          image.remove();
+        }
+      }
+
+      function artistButton(label, action) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", action);
+        attachTilt(button);
+        return button;
+      }
+
+      function setArtistDetails(details, expanded) {
+        details.inert = !expanded;
+        details.setAttribute("aria-hidden", String(!expanded));
+        if (expanded) {
+          details.hidden = false;
+          requestAnimationFrame(() => { details.style.maxHeight = `${details.scrollHeight}px`; });
+          return;
+        }
+        details.style.maxHeight = `${details.scrollHeight}px`;
+        requestAnimationFrame(() => { details.style.maxHeight = "0px"; });
+        setTimeout(() => {
+          if (details.style.maxHeight === "0px") details.hidden = true;
+        }, 200);
+      }
+
+      function renderArtistSuggestions() {
+        const suggestions = document.getElementById("artist-suggestions");
+        suggestions.replaceChildren(...[...artists.entries()]
+          .filter(([key]) => !artistManifest[key] && !artistAliases[key])
+          .map(([, artist]) => {
+            const option = document.createElement("option");
+            option.value = artist.name;
+            return option;
+          }));
+      }
+
+      function renderArtistList() {
+        artistList.replaceChildren();
+        renderArtistSuggestions();
+        const visibleArtists = [...artists.entries()].filter(([key]) => !artistAliases[key]);
+        if (!visibleArtists.length) {
+          const message = document.createElement("p");
+          message.className = "c-dashboard__message";
+          message.textContent = "Cider 재생 이력에서 아티스트를 수집하면 여기에 표시됩니다.";
+          artistList.append(message);
+          return;
+        }
+        for (const [key, artist] of visibleArtists) {
+          const expanded = expandedArtistKey === key;
+          const hasImage = Boolean(artistManifest[key]);
+          const row = document.createElement("article");
+          row.className = "c-dashboard__artist-row";
+          row.dataset.key = key;
+          row.classList.toggle("has-image", hasImage);
+          row.classList.toggle("is-expanded", expanded);
+
+          const summary = document.createElement("button");
+          summary.type = "button";
+          summary.className = "c-dashboard__artist-summary";
+          summary.setAttribute("aria-expanded", String(expanded));
+          summary.innerHTML = `<img class="c-dashboard__artist-thumb" alt=""><span class="c-dashboard__artist-name"></span><span class="c-dashboard__artist-state"></span><svg class="c-dashboard__artist-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>`;
+          const thumbnail = summary.querySelector("img");
+          if (directoryHandle && hasImage) setArtistThumbnail(thumbnail, artistManifest[key]);
+          summary.querySelector(".c-dashboard__artist-name").textContent = artist.name;
+          summary.querySelector(".c-dashboard__artist-state").textContent = hasImage ? "저장되었습니다" : "저장되지 않았습니다";
+          attachTilt(summary);
+          summary.addEventListener("click", () => {
+            const wasExpanded = row.classList.contains("is-expanded");
+            expandedArtistKey = wasExpanded ? null : key;
+            for (const artistRow of artistList.querySelectorAll(".c-dashboard__artist-row")) {
+              const isExpanded = artistRow.dataset.key === expandedArtistKey;
+              artistRow.classList.toggle("is-expanded", isExpanded);
+              artistRow.querySelector(".c-dashboard__artist-summary").setAttribute("aria-expanded", String(isExpanded));
+              const details = artistRow.querySelector(".c-dashboard__artist-details");
+              setArtistDetails(details, isExpanded);
+            }
+          });
+
+          const details = document.createElement("div");
+          details.className = "c-dashboard__artist-details";
+          details.hidden = !expanded;
+          details.inert = !expanded;
+          details.setAttribute("aria-hidden", String(!expanded));
+          const actions = document.createElement("div");
+          actions.className = "c-dashboard__artist-actions";
+          actions.append(
+            artistButton("Deezer에서 저장", () => saveArtistFromDeezer(key)),
+            artistButton("파일로 교체", () => {
+              artistFileInput.dataset.key = key;
+              artistFileInput.click();
+            }),
+            artistButton("URL로 교체", () => replaceArtistFromUrl(key)),
+            artistButton("삭제", () => deleteArtistImage(key)),
+          );
+
+          const aliasField = document.createElement("div");
+          aliasField.className = "c-dashboard__alias-field";
+          aliasField.innerHTML = `<label>다른 이름에도 적용</label><div class="c-dashboard__artist-add"><input list="artist-suggestions" placeholder="아티스트 이름"><button type="button">추가</button></div><p class="c-dashboard__message" hidden>사진을 먼저 저장하세요.</p><ul class="c-dashboard__alias-list"></ul>`;
+          const aliasInput = aliasField.querySelector("input");
+          const aliasAddButton = aliasField.querySelector("button");
+          const aliasHelp = aliasField.querySelector("p");
+          aliasAddButton.disabled = !hasImage;
+          aliasHelp.hidden = hasImage;
+          aliasAddButton.addEventListener("click", async () => {
+            try {
+              await addArtistAlias(key, aliasInput.value);
+              aliasInput.value = "";
+            } catch (error) {
+              setFolderStatus(error.message);
+            }
+          });
+          for (const alias of aliasesFor(key)) {
+            const item = document.createElement("li");
+            const name = artists.get(alias)?.name ?? alias;
+            item.append(document.createTextNode(name), artistButton("삭제", async () => {
+              try {
+                await deleteArtistAlias(alias);
+              } catch (error) {
+                setFolderStatus(`별칭 삭제에 실패했습니다: ${error.message}`);
+              }
+            }));
+            aliasField.querySelector(".c-dashboard__alias-list").append(item);
+          }
+          details.append(actions, aliasField);
+          row.append(summary, details);
+          artistList.append(row);
+          if (expanded) setArtistDetails(details, true);
+        }
+      }
+
+      function scheduleDashboardPolling() {
+        clearInterval(diagnosticTimer);
+        clearInterval(queueTimer);
+        diagnosticTimer = setInterval(refreshDiagnostics, 30000);
+        queueTimer = setInterval(refreshQueue, 30000);
+      }
+
+
+      grid.addEventListener("wheel", event => {
+        if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        event.preventDefault();
+        if (wheelLock) return;
+        wheelAccum += event.deltaY;
+        if (Math.abs(wheelAccum) < 60) return;
+        grid.scrollBy({ left: Math.sign(wheelAccum) * (440 + 56), behavior: "smooth" });
+        wheelAccum = 0;
+        wheelLock = true;
+        setTimeout(() => { wheelLock = false; }, 350);
+      }, { passive: false });
+
+      grid.addEventListener("scroll", () => {
+        grid.classList.add("is-scrolling");
+        clearTimeout(scrollbarIdleTimer);
+        scrollbarIdleTimer = setTimeout(() => grid.classList.remove("is-scrolling"), 700);
+      }, { passive: true });
+
+      preview.addEventListener("load", syncPreviewBridge);
+      [hostInput, tokenInput, fontInput].forEach(input => input.addEventListener("input", event => {
+        flashSetting(event.target);
+        saveSettings();
+      }));
+      bgModeInput.addEventListener("change", event => {
+        flashSetting(event.target);
+        saveSettings();
+      });
+      connectFolderButton.addEventListener("click", connectFolder);
+      downloadConfigButton.addEventListener("click", downloadConfig);
+      refreshDiagnosticsButton.addEventListener("click", refreshDiagnostics);
+      disclosureBody.inert = true;
+      disclosureBody.setAttribute("aria-hidden", "true");
+      disclosureSummary.addEventListener("click", toggleDisclosure);
+      document.querySelectorAll("button, select").forEach(attachTilt);
+      artistAddButton.addEventListener("click", () => {
+        const name = artistManualInput.value.trim();
+        const key = normalizeName(name);
+        if (!key) return;
+        artists.set(key, { name });
+        persistArtists();
+        artistManualInput.value = "";
+        renderArtistList();
+      });
+      artistFileInput.addEventListener("change", async () => {
+        const [file] = artistFileInput.files;
+        const artist = artists.get(artistFileInput.dataset.key);
+        if (file && artist) {
+          try {
+            await saveArtistBlob(artist.name, file);
+          } catch (error) {
+            setFolderStatus(error.message);
+          }
+        }
+        artistFileInput.value = "";
+      });
+
+      restoreMirrors();
+      updateWidgetUrl();
+      connectDashboardSocket();
+      refreshDiagnostics();
+      refreshQueue();
+      scheduleDashboardPolling();
+      restoreFolder();
+    })();
+  </script>
+</body>
+</html>
